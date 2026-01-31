@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Proof Sentiment Aggregator | VICI Trading</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>📊 Social Proof Sentiment Aggregator</h1>
+      <p class="subtitle">Contrarian indicator for ES/SPX/QQQ — When retail is 90%+ bullish, fade it.</p>
+    </header>
+
+    <!-- Alert Banner -->
+    <div id="alert-banner" class="alert-banner hidden">
+      <span id="alert-message"></span>
+      <button onclick="dismissAlert()">Dismiss</button>
+    </div>
+
+    <!-- Current Sentiment Gauge -->
+    <section class="sentiment-gauge">
+      <h2>Current Retail Sentiment</h2>
+      <div class="gauge-container">
+        <div class="gauge">
+          <div class="gauge-fill" id="bullish-fill"></div>
+          <div class="gauge-labels">
+            <span class="bearish-label">🐻 BEARISH</span>
+            <span class="neutral-label">😐</span>
+            <span class="bullish-label">🐂 BULLISH</span>
+          </div>
+        </div>
+        <div class="gauge-value">
+          <span id="bullish-pct" class="big-number">--</span>
+          <span class="pct-label">% Bullish</span>
+        </div>
+      </div>
+      <div class="sentiment-breakdown">
+        <div class="breakdown-item bullish">
+          <span class="label">Bullish</span>
+          <span id="bullish-count" class="value">--%</span>
+        </div>
+        <div class="breakdown-item bearish">
+          <span class="label">Bearish</span>
+          <span id="bearish-count" class="value">--%</span>
+        </div>
+        <div class="breakdown-item neutral">
+          <span class="label">Neutral</span>
+          <span id="neutral-count" class="value">--%</span>
+        </div>
+      </div>
+      <div class="meta-info">
+        <span>Based on <strong id="total-posts">0</strong> posts</span>
+        <span>Last updated: <strong id="last-update">--</strong></span>
+        <button id="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+      </div>
+    </section>
+
+    <!-- Signal Indicator -->
+    <section class="signal-section">
+      <div id="signal-indicator" class="signal neutral">
+        <span class="signal-icon">⚖️</span>
+        <span class="signal-text">NEUTRAL - No extreme signal</span>
+      </div>
+    </section>
+
+    <!-- Historical Chart -->
+    <section class="chart-section">
+      <h2>Sentiment History (24h)</h2>
+      <div class="chart-controls">
+        <button onclick="loadHistory(6)" class="chart-btn">6h</button>
+        <button onclick="loadHistory(24)" class="chart-btn active">24h</button>
+        <button onclick="loadHistory(48)" class="chart-btn">48h</button>
+        <button onclick="loadHistory(168)" class="chart-btn">7d</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="sentiment-chart"></canvas>
+      </div>
+    </section>
+
+    <!-- How to Use -->
+    <section class="info-section">
+      <h2>📖 How to Use This Tool</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>🐂 90%+ Bullish</h3>
+          <p><strong>FADE IT.</strong> When retail is extremely bullish, the market often reverses. Consider taking profits or hedging long positions.</p>
+        </div>
+        <div class="info-card">
+          <h3>🐻 90%+ Bearish</h3>
+          <p><strong>BUY THE PANIC.</strong> Extreme fear often marks bottoms. Look for support levels and consider long entries.</p>
+        </div>
+        <div class="info-card">
+          <h3>⚖️ 40-60% Range</h3>
+          <p><strong>NEUTRAL.</strong> No clear contrarian signal. Trade based on technicals and your normal strategy.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>Built by <strong>VICI Trading Solutions</strong> | Data from StockTwits</p>
+      <p class="disclaimer">For educational purposes only. Not financial advice.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

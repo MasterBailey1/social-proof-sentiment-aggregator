@@ -1,0 +1,360 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --bullish: #3fb950;
+  --bearish: #f85149;
+  --neutral: #8b949e;
+  --accent: #58a6ff;
+  --warning: #d29922;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+header {
+  text-align: center;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* Alert Banner */
+.alert-banner {
+  background: linear-gradient(90deg, var(--warning), #b8860b);
+  color: #000;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
+.alert-banner.hidden {
+  display: none;
+}
+
+.alert-banner button {
+  background: rgba(0,0,0,0.2);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #000;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Sentiment Gauge */
+.sentiment-gauge {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 20px;
+}
+
+.sentiment-gauge h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.3rem;
+}
+
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.gauge {
+  width: 100%;
+  max-width: 500px;
+  height: 40px;
+  background: linear-gradient(90deg, var(--bearish) 0%, var(--neutral) 50%, var(--bullish) 100%);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  background: rgba(255,255,255,0.3);
+  border-right: 4px solid #fff;
+  transition: width 0.5s ease;
+}
+
+.gauge-labels {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.gauge-value {
+  text-align: center;
+}
+
+.big-number {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  line-height: 1;
+}
+
+.pct-label {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* Sentiment Breakdown */
+.sentiment-breakdown {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px solid var(--border);
+}
+
+.breakdown-item {
+  text-align: center;
+}
+
+.breakdown-item .label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.breakdown-item .value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.breakdown-item.bullish .value { color: var(--bullish); }
+.breakdown-item.bearish .value { color: var(--bearish); }
+.breakdown-item.neutral .value { color: var(--neutral); }
+
+/* Meta Info */
+.meta-info {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  align-items: center;
+}
+
+#refresh-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+#refresh-btn:hover {
+  opacity: 0.8;
+}
+
+/* Signal Section */
+.signal-section {
+  margin-bottom: 20px;
+}
+
+.signal {
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.signal-icon {
+  font-size: 2rem;
+}
+
+.signal.neutral {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.signal.bullish-extreme {
+  background: linear-gradient(135deg, #3fb950, #238636);
+  color: #fff;
+  animation: pulse 1.5s infinite;
+}
+
+.signal.bearish-extreme {
+  background: linear-gradient(135deg, #f85149, #da3633);
+  color: #fff;
+  animation: pulse 1.5s infinite;
+}
+
+.signal.bullish-high {
+  background: rgba(63, 185, 80, 0.2);
+  border: 2px solid var(--bullish);
+  color: var(--bullish);
+}
+
+.signal.bearish-high {
+  background: rgba(248, 81, 73, 0.2);
+  border: 2px solid var(--bearish);
+  color: var(--bearish);
+}
+
+/* Chart Section */
+.chart-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.chart-section h2 {
+  margin-bottom: 15px;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.chart-btn {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chart-btn:hover, .chart-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.chart-container {
+  height: 300px;
+}
+
+/* Info Section */
+.info-section {
+  margin-bottom: 30px;
+}
+
+.info-section h2 {
+  margin-bottom: 20px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.info-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.info-card p {
+  color: var(--text-muted);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.disclaimer {
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .sentiment-breakdown {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .meta-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .big-number {
+    font-size: 3rem;
+  }
+}
