@@ -7,7 +7,7 @@ const db = require('./db');
 const execAsync = promisify(exec);
 
 // Tickers to track
-const TICKERS = ['SPY', 'ES_F', 'QQQ', 'SPX', 'NDX'];
+const TICKERS = ['SPY', 'ES_F', 'QQQ', 'SPX', 'NDX', 'NQ_F'];
 const SEARCH_TERMS = ['SPY', 'ES', 'SPX', 'QQQ', 'NDX', '$SPY', '$ES', '$SPX', '$QQQ', '$NDX', 'NQ', '$NQ'];
 
 // Sentiment keywords
@@ -154,7 +154,7 @@ async function fetchTwitterSentiment() {
   
   const results = { bullish: 0, bearish: 0, neutral: 0, total: 0 };
   
-  for (const term of ['$SPY', '$SPX', '$QQQ', '$NDX', '#ES_F', '#NQ_F', 'ES futures']) {
+  for (const term of ['$SPY', '$SPX', '$QQQ', '$NDX', '#ES_F', '#NQ_F', 'ES futures', 'NQ futures']) {
     try {
       const command = `bird search "${term}" --limit 30`;
       const { stdout } = await execAsync(command, {

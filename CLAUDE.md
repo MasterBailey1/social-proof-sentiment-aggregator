@@ -119,13 +119,13 @@ Social Media Sentiment Indicator/
 ## Tickers Tracked
 
 ### StockTwits
-- SPY, ES_F, QQQ, SPX, NDX
+- SPY, ES_F, QQQ, SPX, NDX, NQ_F
 
 ### Reddit Search Terms
 - SPY, ES, SPX, QQQ, NDX, $SPY, $ES, $SPX, $QQQ, $NDX, NQ, $NQ
 
 ### Twitter/X Search Terms
-- $SPY, $SPX, $QQQ, $NDX, #ES_F, #NQ_F, ES futures
+- $SPY, $SPX, $QQQ, $NDX, #ES_F, #NQ_F, ES futures, NQ futures
 
 ---
 
@@ -202,7 +202,10 @@ Node.js is installed at `D:\` on this system. The batch file is configured to us
 
 ## Recent Changes (2026-02-02)
 
-1. **Added tickers:** NDX added to StockTwits, NQ/$NQ to Reddit, #ES_F/#NQ_F to Twitter
+1. **Added tickers:**
+   - StockTwits: NDX, NQ_F
+   - Reddit: NQ, $NQ
+   - Twitter/X: #ES_F, #NQ_F, ES futures, NQ futures
 2. **Source breakdown feature:** Dashboard now shows sentiment per source (StockTwits, Reddit, Twitter/X)
 3. **Desktop shortcut:** Created "Sentiment Dashboard" shortcut for one-click launch
 4. **API updated:** `/api/sentiment/current` now includes `sourceBreakdown` object
@@ -247,4 +250,4 @@ Node.js is installed at `D:\` on this system. The batch file is configured to us
 
 ---
 
-*Last updated: 2026-02-02 by Claude*
+*Last updated: 2026-02-02 by Claude (session 2)*
