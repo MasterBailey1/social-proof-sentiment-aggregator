@@ -12,7 +12,7 @@
     <!-- Header -->
     <header>
       <h1>📊 Social Proof Sentiment Aggregator</h1>
-      <p class="subtitle">Contrarian indicator for ES/SPX/QQQ — When retail is 90%+ bullish, fade it.</p>
+      <p class="subtitle">Contrarian indicator for ES/SPX/SPY/QQQ/NDX — When retail is 90%+ bullish, fade it.</p>
     </header>
 
     <!-- Alert Banner -->
@@ -67,6 +67,23 @@
       </div>
     </section>
 
+    <!-- Source Breakdown -->
+    <section class="source-breakdown">
+      <h2>Sentiment by Source</h2>
+      <div id="source-cards" class="source-grid">
+        <!-- Cards will be populated by JavaScript -->
+        <div class="source-card loading">
+          <div class="source-header">
+            <span class="source-icon">⏳</span>
+            <span class="source-name">Loading...</span>
+          </div>
+          <div class="source-body">
+            <p class="loading-text">Fetching data...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Historical Chart -->
     <section class="chart-section">
       <h2>Sentiment History (24h)</h2>
@@ -102,7 +119,7 @@
 
     <!-- Footer -->
     <footer>
-      <p>Built by <strong>VICI Trading Solutions</strong> | Data from StockTwits</p>
+      <p>Built by <strong>VICI Trading Solutions</strong> | Data from StockTwits, Reddit, Twitter/X</p>
       <p class="disclaimer">For educational purposes only. Not financial advice.</p>
     </footer>
   </div>

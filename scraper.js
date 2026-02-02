@@ -7,8 +7,8 @@ const db = require('./db');
 const execAsync = promisify(exec);
 
 // Tickers to track
-const TICKERS = ['SPY', 'ES_F', 'QQQ', 'SPX'];
-const SEARCH_TERMS = ['SPY', 'ES', 'SPX', 'QQQ', '$SPY', '$ES', '$SPX', '$QQQ'];
+const TICKERS = ['SPY', 'ES_F', 'QQQ', 'SPX', 'NDX'];
+const SEARCH_TERMS = ['SPY', 'ES', 'SPX', 'QQQ', 'NDX', '$SPY', '$ES', '$SPX', '$QQQ', '$NDX', 'NQ', '$NQ'];
 
 // Sentiment keywords
 const BULLISH_KEYWORDS = ['bullish', 'bull', 'long', 'calls', 'buy', 'moon', 'pump', 'rip', 'green', 'rocket', 'ath', 'breakout', 'higher', 'uppies'];
@@ -154,7 +154,7 @@ async function fetchTwitterSentiment() {
   
   const results = { bullish: 0, bearish: 0, neutral: 0, total: 0 };
   
-  for (const term of ['SPY', 'ES futures', 'SPX']) {
+  for (const term of ['$SPY', '$SPX', '$QQQ', '$NDX', '#ES_F', '#NQ_F', 'ES futures']) {
     try {
       const command = `bird search "${term}" --limit 30`;
       const { stdout } = await execAsync(command, {
@@ -215,15 +215,21 @@ async function fetchTwitterSentiment() {
  */
 async function aggregateSentiment() {
   console.log(`\n📊 Scraping sentiment at ${new Date().toLocaleTimeString()}...`);
-  
+
   const allResults = [];
-  
+  const sourceBreakdown = {};
+
   // 1. StockTwits (primary source - has built-in sentiment)
   console.log('\n   📈 StockTwits:');
+  let stocktwitsData = { bullish: 0, bearish: 0, neutral: 0, total: 0 };
   for (const ticker of TICKERS) {
     const sentiment = await fetchStockTwitsSentiment(ticker);
     if (sentiment) {
       allResults.push(sentiment);
+      stocktwitsData.bullish += sentiment.bullish;
+      stocktwitsData.bearish += sentiment.bearish;
+      stocktwitsData.neutral += sentiment.neutral;
+      stocktwitsData.total += sentiment.total;
       db.insertReading(
         sentiment.source, sentiment.ticker,
         sentiment.bullish, sentiment.bearish, sentiment.neutral, sentiment.total,
@@ -233,12 +239,32 @@ async function aggregateSentiment() {
     }
     await new Promise(r => setTimeout(r, 500));
   }
-  
+  if (stocktwitsData.total > 0) {
+    sourceBreakdown.stocktwits = {
+      source: 'stocktwits',
+      label: 'StockTwits',
+      icon: '📈',
+      bullish: stocktwitsData.bullish,
+      bearish: stocktwitsData.bearish,
+      neutral: stocktwitsData.neutral,
+      total: stocktwitsData.total,
+      bullishPct: (stocktwitsData.bullish / stocktwitsData.total * 100),
+      bearishPct: (stocktwitsData.bearish / stocktwitsData.total * 100),
+      neutralPct: (stocktwitsData.neutral / stocktwitsData.total * 100)
+    };
+  }
+
   // 2. Reddit
   console.log('\n   🤖 Reddit:');
   const redditSentiment = await fetchRedditSentiment();
   if (redditSentiment && redditSentiment.total > 0) {
     allResults.push(redditSentiment);
+    sourceBreakdown.reddit = {
+      source: 'reddit',
+      label: 'Reddit',
+      icon: '🤖',
+      ...redditSentiment
+    };
     db.insertReading(
       'reddit', 'ALL',
       redditSentiment.bullish, redditSentiment.bearish, redditSentiment.neutral, redditSentiment.total,
@@ -248,12 +274,18 @@ async function aggregateSentiment() {
   } else {
     console.log('      No relevant posts found');
   }
-  
+
   // 3. Twitter/X
   console.log('\n   🐦 Twitter/X:');
   const twitterSentiment = await fetchTwitterSentiment();
   if (twitterSentiment && twitterSentiment.total > 0) {
     allResults.push(twitterSentiment);
+    sourceBreakdown.twitter = {
+      source: 'twitter',
+      label: 'Twitter/X',
+      icon: '🐦',
+      ...twitterSentiment
+    };
     db.insertReading(
       'twitter', 'ALL',
       twitterSentiment.bullish, twitterSentiment.bearish, twitterSentiment.neutral, twitterSentiment.total,
@@ -261,27 +293,27 @@ async function aggregateSentiment() {
     );
     console.log(`      Combined: ${twitterSentiment.bullishPct.toFixed(1)}% bullish (${twitterSentiment.total} tweets)`);
   }
-  
+
   // Calculate weighted aggregate
   if (allResults.length === 0) {
     console.log('\n   ❌ No sentiment data collected');
     return null;
   }
-  
+
   const totalBullish = allResults.reduce((sum, r) => sum + r.bullish, 0);
   const totalBearish = allResults.reduce((sum, r) => sum + r.bearish, 0);
   const totalNeutral = allResults.reduce((sum, r) => sum + r.neutral, 0);
   const totalPosts = allResults.reduce((sum, r) => sum + r.total, 0);
-  
+
   const aggBullishPct = totalPosts > 0 ? (totalBullish / totalPosts * 100) : 0;
   const aggBearishPct = totalPosts > 0 ? (totalBearish / totalPosts * 100) : 0;
   const aggNeutralPct = totalPosts > 0 ? (totalNeutral / totalPosts * 100) : 0;
-  
+
   // Check for extreme signals
   let extremeSignal = null;
   if (aggBullishPct >= 90) {
     extremeSignal = 'EXTREME_BULLISH';
-    db.insertAlert('EXTREME_BULLISH', aggBullishPct, 
+    db.insertAlert('EXTREME_BULLISH', aggBullishPct,
       `🚨 CONTRARIAN ALERT: Retail is ${aggBullishPct.toFixed(1)}% bullish. Consider fading.`);
     console.log(`\n   ⚠️ EXTREME BULLISH SIGNAL: ${aggBullishPct.toFixed(1)}% - FADE IT!`);
   } else if (aggBearishPct >= 90) {
@@ -296,23 +328,24 @@ async function aggregateSentiment() {
     extremeSignal = 'HIGH_BEARISH';
     console.log(`\n   📉 HIGH BEARISH: ${aggBearishPct.toFixed(1)}% - Fear building...`);
   }
-  
-  // Store aggregate
-  db.insertAggregate(aggBullishPct, aggBearishPct, aggNeutralPct, totalPosts, extremeSignal);
-  
+
+  // Store aggregate with source breakdown
+  db.insertAggregate(aggBullishPct, aggBearishPct, aggNeutralPct, totalPosts, extremeSignal, sourceBreakdown);
+
   const sources = allResults.map(r => r.source).join(', ');
   console.log(`\n   ═══════════════════════════════════════════════`);
   console.log(`   📊 AGGREGATE: ${aggBullishPct.toFixed(1)}% bullish | ${aggBearishPct.toFixed(1)}% bearish`);
   console.log(`   📝 Sources: ${sources} | Total: ${totalPosts} posts`);
   console.log(`   ═══════════════════════════════════════════════\n`);
-  
+
   return {
     bullishPct: aggBullishPct,
     bearishPct: aggBearishPct,
     neutralPct: aggNeutralPct,
     totalPosts,
     extremeSignal,
-    sources: allResults.map(r => r.source)
+    sources: allResults.map(r => r.source),
+    sourceBreakdown
   };
 }
 

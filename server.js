@@ -29,6 +29,7 @@ app.get('/api/sentiment/current', (req, res) => {
         totalPosts: 0,
         extremeSignal: null,
         timestamp: new Date().toISOString(),
+        sourceBreakdown: null,
         message: 'No data yet - scraping in progress'
       });
     }
@@ -38,7 +39,8 @@ app.get('/api/sentiment/current', (req, res) => {
       neutralPct: latest.neutral_pct,
       totalPosts: latest.total_posts,
       extremeSignal: latest.extreme_signal,
-      timestamp: latest.timestamp
+      timestamp: latest.timestamp,
+      sourceBreakdown: latest.source_breakdown || null
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -48,7 +48,7 @@ function insertReading(source, ticker, bullish, bearish, neutral, total, bullish
 }
 
 // Insert aggregate sentiment
-function insertAggregate(bullishPct, bearishPct, neutralPct, totalPosts, extremeSignal) {
+function insertAggregate(bullishPct, bearishPct, neutralPct, totalPosts, extremeSignal, sourceBreakdown = null) {
   const db = loadDB();
   db.aggregate.push({
     id: db.aggregate.length + 1,
@@ -57,7 +57,8 @@ function insertAggregate(bullishPct, bearishPct, neutralPct, totalPosts, extreme
     bearish_pct: bearishPct,
     neutral_pct: neutralPct,
     total_posts: totalPosts,
-    extreme_signal: extremeSignal
+    extreme_signal: extremeSignal,
+    source_breakdown: sourceBreakdown
   });
   // Keep last 500 aggregate readings
   if (db.aggregate.length > 500) {

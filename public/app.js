@@ -24,12 +24,13 @@ async function loadCurrentSentiment() {
   try {
     const response = await fetch(`${API_BASE}/api/sentiment/current`);
     const data = await response.json();
-    
+
     updateGauge(data);
     updateBreakdown(data);
     updateSignal(data);
     updateMeta(data);
-    
+    updateSourceBreakdown(data.sourceBreakdown);
+
   } catch (error) {
     console.error('Error loading sentiment:', error);
   }
@@ -118,11 +119,97 @@ function updateSignal(data) {
  */
 function updateMeta(data) {
   document.getElementById('total-posts').textContent = data.totalPosts || 0;
-  
+
   if (data.timestamp) {
     const date = new Date(data.timestamp);
     document.getElementById('last-update').textContent = date.toLocaleTimeString();
   }
+}
+
+/**
+ * Update source breakdown cards
+ */
+function updateSourceBreakdown(sourceBreakdown) {
+  const container = document.getElementById('source-cards');
+
+  // Define all possible sources with their display info
+  const sourceConfig = {
+    stocktwits: { label: 'StockTwits', icon: '📈' },
+    reddit: { label: 'Reddit', icon: '🤖' },
+    twitter: { label: 'Twitter/X', icon: '🐦' }
+  };
+
+  // If no data yet, show loading state
+  if (!sourceBreakdown || Object.keys(sourceBreakdown).length === 0) {
+    container.innerHTML = Object.entries(sourceConfig).map(([key, config]) => `
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-icon">${config.icon}</span>
+          <span class="source-name">${config.label}</span>
+        </div>
+        <div class="source-body">
+          <p class="no-data">No data yet</p>
+        </div>
+      </div>
+    `).join('');
+    return;
+  }
+
+  // Build cards for each source
+  let html = '';
+
+  for (const [key, config] of Object.entries(sourceConfig)) {
+    const data = sourceBreakdown[key];
+
+    if (data && data.total > 0) {
+      const bullishPct = data.bullishPct.toFixed(1);
+      const bearishPct = data.bearishPct.toFixed(1);
+      const neutralPct = data.neutralPct.toFixed(1);
+
+      html += `
+        <div class="source-card">
+          <div class="source-header">
+            <span class="source-icon">${config.icon}</span>
+            <span class="source-name">${config.label}</span>
+            <span class="source-posts">${data.total} posts</span>
+          </div>
+          <div class="source-body">
+            <div class="source-sentiment-bar">
+              <div class="source-sentiment-indicator" style="left: calc(${bullishPct}% - 2px);"></div>
+            </div>
+            <div class="source-stats">
+              <div class="source-stat bullish">
+                <span class="stat-label">Bullish</span>
+                <span class="stat-value">${bullishPct}%</span>
+              </div>
+              <div class="source-stat bearish">
+                <span class="stat-label">Bearish</span>
+                <span class="stat-value">${bearishPct}%</span>
+              </div>
+              <div class="source-stat neutral">
+                <span class="stat-label">Neutral</span>
+                <span class="stat-value">${neutralPct}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="source-card">
+          <div class="source-header">
+            <span class="source-icon">${config.icon}</span>
+            <span class="source-name">${config.label}</span>
+          </div>
+          <div class="source-body">
+            <p class="no-data">No data available</p>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  container.innerHTML = html;
 }
 
 /**
